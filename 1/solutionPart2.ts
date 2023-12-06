@@ -7,7 +7,7 @@ const digitsSpelledOut: [string, string][] = [['one', '1'], ['two', '2'], ['thre
 let totalSum = 0
 
 inputStringArray.forEach(inputString => {
-    console.log(inputString)
+    // console.log(inputString)
     digitsSpelledOut.forEach(digitTuple => {
         let indexOfDigitString = inputString.indexOf(digitTuple[0])
         while (indexOfDigitString !== -1) {
@@ -15,7 +15,7 @@ inputStringArray.forEach(inputString => {
             indexOfDigitString = inputString.indexOf(digitTuple[0])
         }
     });
-    console.log(inputString)
+    // console.log(inputString)
 
     let firstNumber: string
     let lastNumber: string
@@ -40,7 +40,7 @@ inputStringArray.forEach(inputString => {
     // console.log(inputString)
     // console.log(firstNumber)
     // console.log(lastNumber)
-    console.log(lineSumNumber)
+    // console.log(lineSumNumber)
 });
 
 console.log(totalSum)

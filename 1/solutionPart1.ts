@@ -25,10 +25,10 @@ inputStringArray.forEach(inputString => {
     const lineSumNumber = parseInt(lineSumString)
 
     totalSum += lineSumNumber
-    console.log(inputString)
-    console.log(firstNumber)
-    console.log(lastNumber)
-    console.log(lineSumNumber)
+    // console.log(inputString)
+    // console.log(firstNumber)
+    // console.log(lastNumber)
+    // console.log(lineSumNumber)
 });
 
 console.log(totalSum)
