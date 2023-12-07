@@ -46,25 +46,25 @@ export function isThereASymbol(input, rowIndex, start, end): boolean {
     if (start > end) {
         throw(`End must be greater than start when checking for symbols: start ${start}, end ${end}`)
     }
-    // console.log(rowIndex, start, end)
+    console.log(rowIndex, start, end)
     const leftSideCheck = start > 0 ? 1 : 0
-    const rightSideCheck = end <= inputStringArray[0].length ? 1 : 0
+    const rightSideCheck = end < input[0].length - 1 ? 1 : 0
 
     // Check row above
     if (rowIndex !== 0) {
         for (let i = start - leftSideCheck; i <= end + rightSideCheck; i++) {
-            if (inputStringArray[rowIndex - 1].charAt(i) !== '.') {
-                console.log(inputStringArray[rowIndex - 1].charAt(i))
+            if (input[rowIndex - 1].charAt(i) !== '.') {
+                console.log(input[rowIndex - 1].charAt(i))
                 return true
             }
         }
     }
 
     // Check row below
-    if (rowIndex !== inputStringArray.length - 1) {
+    if (rowIndex !== input.length - 1) {
         for (let i = start - leftSideCheck; i <= end + rightSideCheck; i++) {
-            if (inputStringArray[rowIndex + 1].charAt(i) !== '.') {
-                console.log(inputStringArray[rowIndex + 1].charAt(i))
+            if (input[rowIndex + 1].charAt(i) !== '.') {
+                console.log(input[rowIndex + 1].charAt(i))
                 return true
             }
         }
@@ -72,16 +72,16 @@ export function isThereASymbol(input, rowIndex, start, end): boolean {
     
     // Check char left
     if (leftSideCheck != 0) {
-        if (inputStringArray[rowIndex].charAt(start - 1) !== '.') {
-            console.log(inputStringArray[rowIndex].charAt(start - 1))
+        if (input[rowIndex].charAt(start - 1) !== '.') {
+            console.log(input[rowIndex].charAt(start - 1))
             return true
         } 
     }
 
-    // // // Check char right
+    // Check char right
     if (rightSideCheck != 0) {
-        if (inputStringArray[rowIndex].charAt(end + 1) !== '.') {
-            console.log(inputStringArray[rowIndex].charAt(end + 1))
+        if (input[rowIndex].charAt(end + 1) !== '.') {
+            console.log(input[rowIndex].charAt(end + 1))
             return true
         } 
     }

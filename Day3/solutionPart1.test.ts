@@ -4,7 +4,7 @@ import { isThereASymbol } from "./solutionPart1";
 test("Test isThereASymbol no symbols regular position", () => {
     const testInput = ['.....', '.123.', '.....']
     const result = isThereASymbol(testInput, 1, 1, 3)
-    expect(result == false)
+    expect(result).toBeFalse()
 })
 
 test("Test isThereASymbol all regular symbol positions", () => {
@@ -19,7 +19,8 @@ test("Test isThereASymbol all regular symbol positions", () => {
                 
                 console.log(testInputCase)
                 const result = isThereASymbol(testInputCase, 1, 1, 3)
-                expect(result == true)
+                console.log(result)
+                expect(result).toBeTrue()
             }
         }
     }
@@ -27,8 +28,8 @@ test("Test isThereASymbol all regular symbol positions", () => {
 
 test("Test isThereASymbol no symbols no left", () => {
     const testInput = ['....', '123.', '....']
-    const result = isThereASymbol(testInput, 1, 1, 3)
-    expect(result == false)
+    const result = isThereASymbol(testInput, 1, 0, 2)
+    expect(result).toBeFalse()
 })
 
 test("Test isThereASymbol no left", () => {
@@ -42,8 +43,9 @@ test("Test isThereASymbol no left", () => {
                 testInputCase[i] = testInputCase[i].substring(0, j) + '$' + testInputCase[i].substring(j + 1, testInputTemplate[0].length)
                 
                 console.log(testInputCase)
-                const result = isThereASymbol(testInputCase, 1, 1, 3)
-                expect(result == true)
+                const result = isThereASymbol(testInputCase, 1, 0, 2)
+                console.log(result)
+                expect(result).toBeTrue()
             }
         }
     }
@@ -52,7 +54,7 @@ test("Test isThereASymbol no left", () => {
 test("Test isThereASymbol no symbols no right", () => {
     const testInput = ['....', '.123', '....']
     const result = isThereASymbol(testInput, 1, 1, 3)
-    expect(result == false)
+    expect(result).toBeFalse()
 })
 
 test("Test isThereASymbol no right", () => {
@@ -67,7 +69,7 @@ test("Test isThereASymbol no right", () => {
                 
                 console.log(testInputCase)
                 const result = isThereASymbol(testInputCase, 1, 1, 3)
-                expect(result == true)
+                expect(result).toBeTrue()
             }
         }
     }
@@ -75,8 +77,8 @@ test("Test isThereASymbol no right", () => {
 
 test("Test isThereASymbol no symbols no top", () => {
     const testInput = ['.123.', '.....']
-    const result = isThereASymbol(testInput, 1, 1, 3)
-    expect(result == false)
+    const result = isThereASymbol(testInput, 0, 1, 3)
+    expect(result).toBeFalse()
 })
 
 test("Test isThereASymbol no top", () => {
@@ -90,8 +92,8 @@ test("Test isThereASymbol no top", () => {
                 testInputCase[i] = testInputCase[i].substring(0, j) + '$' + testInputCase[i].substring(j + 1, testInputTemplate[0].length)
                 
                 console.log(testInputCase)
-                const result = isThereASymbol(testInputCase, 1, 1, 3)
-                expect(result == true)
+                const result = isThereASymbol(testInputCase, 0, 1, 3)
+                expect(result).toBeTrue()
             }
         }
     }
@@ -100,7 +102,7 @@ test("Test isThereASymbol no top", () => {
 test("Test isThereASymbol no symbols no bottom", () => {
     const testInput = ['.....', '.123.']
     const result = isThereASymbol(testInput, 1, 1, 3)
-    expect(result == false)
+    expect(result).toBeFalse()
 })
 
 test("Test isThereASymbol no bottom", () => {
@@ -115,7 +117,7 @@ test("Test isThereASymbol no bottom", () => {
                 
                 console.log(testInputCase)
                 const result = isThereASymbol(testInputCase, 1, 1, 3)
-                expect(result == true)
+                expect(result).toBeTrue()
             }
         }
     }
