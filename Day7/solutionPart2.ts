@@ -34,30 +34,30 @@ inputStringArray.forEach(handAndBid => {
         }
     }
 
-    let numberOfDifferentCards = Object.values(handCardsMap)
+    let numberOfDifferentCardsArray = Object.values(handCardsMap)
 
     if (numberOfJokers > 0) {
-        if (numberOfDifferentCards.length === 0) {
-            numberOfDifferentCards = [numberOfJokers]
+        if (numberOfDifferentCardsArray.length === 0) {
+            numberOfDifferentCardsArray = [numberOfJokers]
         } else {
-            numberOfDifferentCards.sort((one, two) => (one > two ? -1 : 1))[0] += numberOfJokers
+            numberOfDifferentCardsArray.sort((one, two) => (one > two ? -1 : 1))[0] += numberOfJokers
         }
     }
 
 
-    if (numberOfDifferentCards.includes(5)) {
+    if (numberOfDifferentCardsArray.includes(5)) {
         hands.fiveOfAKinds.push(hand)
-    } else if (numberOfDifferentCards.includes(4)) {
+    } else if (numberOfDifferentCardsArray.includes(4)) {
         hands.fourOfAKinds.push(hand)
-    } else if (numberOfDifferentCards.includes(3) && (numberOfDifferentCards.includes(2))) {
+    } else if (numberOfDifferentCardsArray.includes(3) && (numberOfDifferentCardsArray.includes(2))) {
         hands.fullHouses.push(hand)
-    } else if (numberOfDifferentCards.includes(3)) {
+    } else if (numberOfDifferentCardsArray.includes(3)) {
         hands.threeOfAKinds.push(hand)
-    } else if (2 == numberOfDifferentCards.filter(card => card == 2).length) {
+    } else if (2 == numberOfDifferentCardsArray.filter(card => card == 2).length) {
         hands.twoPairs.push(hand)
-    } else if (numberOfDifferentCards.includes(2)){
+    } else if (numberOfDifferentCardsArray.includes(2)){
         hands.onePairs.push(hand)
-    } else if(numberOfDifferentCards.includes(1)) {
+    } else if(numberOfDifferentCardsArray.includes(1)) {
         hands.highCards.push(hand)
     } else {
         console.log("Number of different cards array is empty!")
