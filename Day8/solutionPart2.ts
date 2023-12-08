@@ -1,133 +1,46 @@
 export {} 
 
-interface Hands {
-    highCards: string[],
-    onePairs: string[],
-    twoPairs: string[],
-    threeOfAKinds: string[],
-    fullHouses: string[],
-    fourOfAKinds: string[],
-    fiveOfAKinds: string[]
-}
-const cardValueMapping = {'A': 14, 'K': 13, 'Q': 12, 'T': 10, '9': 9, '8': 8, '7': 7, '6': 6, '5': 5, '4': 4, '3': 3, '2': 2, 'J': 1}
-
-let hands: Hands = {highCards: [], onePairs: [], twoPairs: [], threeOfAKinds: [], fullHouses: [], fourOfAKinds: [], fiveOfAKinds: []}
-let handBidMap = {}
+const leftRightInstructions = 'LRLRLLRLRLRRLRLRLRRLRLRLLRRLRRLRLRLRLLRRRLRRRLLRRLRLRLRRRLRRLRRRLRLRLRRLRLLRLRLRRLRRRLRLRRLRRRLLRLRLRRRLRRRLRLRRRLRLRRRLLRRLLLRRRLLRRRLRRRLRRRLRLRLRLLRLRRLRLRLLLRRLRRLRRLRLRRLRRLLRRLRLRRRLRLRLLRRRLRRRLRRRLLLRRRLRLRLRRLRRRLRRRLRLRRRLRRLRRRLRLRRLLRRRLRRRLLLRRLRLRLRRLRRRLRRLRRLRLRRRR'
 
 const inputString = await Bun.file('input.txt').text()
 const inputStringArray = inputString.split('\n')
 
-inputStringArray.forEach(handAndBid => {
-    let hand = handAndBid.split(' ')[0]
-    let bid = parseInt(handAndBid.split(' ')[1])
-    handBidMap[hand] = bid
+let directionsMap: { [id: string]: [string, string] } = {}
+let numberOfStepsArray = []
+let lcm = 1
 
-    let handCardsMap: { [id: string] : number} = {}
-    let numberOfJokers = 0
-    for (const char of hand) {
-        if (char == 'J') {
-            numberOfJokers ++
-        } else if (char in handCardsMap) {
-            handCardsMap[char] ++
+inputStringArray.forEach(directionLine => {
+    const location = directionLine.split('=')[0].trim()
+    const leftDirection = directionLine.split('=')[1].trim().split(',')[0].trim().substring(1)
+    const rightDirection = directionLine.split('=')[1].trim().split(',')[1].trim().substring(0, 3)
+
+    directionsMap[location] = [leftDirection, rightDirection]
+});
+
+console.log(directionsMap)
+
+let locationsToStartFrom = Object.keys(directionsMap).filter(location => location[2] == 'A')
+    
+for (let i = 0; i < locationsToStartFrom.length; i++) {
+    let numberOfSteps = 0
+    let currentLocation = locationsToStartFrom[i]
+
+    while(currentLocation[2] !== 'Z') {
+        let nextLocationPair = directionsMap[currentLocation]
+        let rightOrLeft = leftRightInstructions[numberOfSteps % leftRightInstructions.length]
+        if (rightOrLeft === 'L') {
+            currentLocation = nextLocationPair[0]
+        } else if (rightOrLeft === 'R') {
+            currentLocation = nextLocationPair[1]
         } else {
-            handCardsMap[char] = 1
+            throw("right or left isn't R or L")
         }
+        numberOfSteps++
     }
-
-    let numberOfDifferentCardsArray = Object.values(handCardsMap)
-
-    if (numberOfJokers > 0) {
-        if (numberOfDifferentCardsArray.length === 0) {
-            numberOfDifferentCardsArray = [numberOfJokers]
-        } else {
-            numberOfDifferentCardsArray.sort((one, two) => (one > two ? -1 : 1))[0] += numberOfJokers
-        }
-    }
-
-
-    if (numberOfDifferentCardsArray.includes(5)) {
-        hands.fiveOfAKinds.push(hand)
-    } else if (numberOfDifferentCardsArray.includes(4)) {
-        hands.fourOfAKinds.push(hand)
-    } else if (numberOfDifferentCardsArray.includes(3) && (numberOfDifferentCardsArray.includes(2))) {
-        hands.fullHouses.push(hand)
-    } else if (numberOfDifferentCardsArray.includes(3)) {
-        hands.threeOfAKinds.push(hand)
-    } else if (2 == numberOfDifferentCardsArray.filter(card => card == 2).length) {
-        hands.twoPairs.push(hand)
-    } else if (numberOfDifferentCardsArray.includes(2)){
-        hands.onePairs.push(hand)
-    } else if(numberOfDifferentCardsArray.includes(1)) {
-        hands.highCards.push(hand)
-    } else {
-        console.log("Number of different cards array is empty!")
-    }
-
-});
-
-hands.highCards.sort(sortHands)
-hands.onePairs.sort(sortHands)
-hands.twoPairs.sort(sortHands)
-hands.threeOfAKinds.sort(sortHands)
-hands.fullHouses.sort(sortHands)
-hands.fourOfAKinds.sort(sortHands)
-hands.fiveOfAKinds.sort(sortHands)
-
-let handCounter = 1
-let totalWinnings = 0
-
-hands.highCards.forEach(hand => {
-    let handBid = handBidMap[hand]
-    totalWinnings += handBid * handCounter
-    handCounter ++
-});
-hands.onePairs.forEach(hand => {
-    let handBid = handBidMap[hand]
-    totalWinnings += handBid * handCounter
-    handCounter ++
-});
-hands.twoPairs.forEach(hand => {
-    let handBid = handBidMap[hand]
-    totalWinnings += handBid * handCounter
-    handCounter ++
-});
-hands.threeOfAKinds.forEach(hand => {
-    let handBid = handBidMap[hand]
-    totalWinnings += handBid * handCounter
-    handCounter ++
-});
-hands.fullHouses.forEach(hand => {
-    let handBid = handBidMap[hand]
-    totalWinnings += handBid * handCounter
-    handCounter ++
-});
-hands.fourOfAKinds.forEach(hand => {
-    let handBid = handBidMap[hand]
-    totalWinnings += handBid * handCounter
-    handCounter ++
-});
-hands.fiveOfAKinds.forEach(hand => {
-    let handBid = handBidMap[hand]
-    totalWinnings += handBid * handCounter
-    handCounter ++
-});
-
-console.log(hands)
-console.log(handCounter)
-console.log(totalWinnings)
-
-function sortHands(a: string, b: string): number {
-    for (let i = 0; i < a.length; i++) {
-        if (cardValueMapping[a[i]] < cardValueMapping[b[i]]) {
-            // console.log(a, "is less than", b)
-            return -1
-        } else if (cardValueMapping[a[i]] == cardValueMapping[b[i]]) {
-            continue
-        } else {
-            // console.log(a, "is greater than", b)
-            return 1
-        }
-    }
-
-    return 0
+    
+    lcm *= numberOfSteps
+    numberOfStepsArray.push(numberOfSteps)
 }
+
+// Plug into LCM calculator - don't need to write code for this
+console.log(numberOfStepsArray)
