@@ -1,36 +1,133 @@
 export {} 
 
-interface Race {
-    totalTime: number,
-    targetDistance: number
+interface Hands {
+    highCards: string[],
+    onePairs: string[],
+    twoPairs: string[],
+    threeOfAKinds: string[],
+    fullHouses: string[],
+    fourOfAKinds: string[],
+    fiveOfAKinds: string[]
 }
+const cardValueMapping = {'A': 14, 'K': 13, 'Q': 12, 'T': 10, '9': 9, '8': 8, '7': 7, '6': 6, '5': 5, '4': 4, '3': 3, '2': 2, 'J': 1}
+
+let hands: Hands = {highCards: [], onePairs: [], twoPairs: [], threeOfAKinds: [], fullHouses: [], fourOfAKinds: [], fiveOfAKinds: []}
+let handBidMap = {}
 
 const inputString = await Bun.file('input.txt').text()
 const inputStringArray = inputString.split('\n')
-const time = parseInt(inputStringArray[0].split(':')[1].replace(/\s/g,''))
-const distance = parseInt(inputStringArray[1].split(':')[1].replace(/\s/g,''))
-let race: Race = {totalTime: time, targetDistance: distance}
+
+inputStringArray.forEach(handAndBid => {
+    let hand = handAndBid.split(' ')[0]
+    let bid = parseInt(handAndBid.split(' ')[1])
+    handBidMap[hand] = bid
+
+    let handCardsMap: { [id: string] : number} = {}
+    let numberOfJokers = 0
+    for (const char of hand) {
+        if (char == 'J') {
+            numberOfJokers ++
+        } else if (char in handCardsMap) {
+            handCardsMap[char] ++
+        } else {
+            handCardsMap[char] = 1
+        }
+    }
+
+    let numberOfDifferentCards = Object.values(handCardsMap)
+
+    if (numberOfJokers > 0) {
+        if (numberOfDifferentCards.length === 0) {
+            numberOfDifferentCards = [numberOfJokers]
+        } else {
+            numberOfDifferentCards.sort((one, two) => (one > two ? -1 : 1))[0] += numberOfJokers
+        }
+    }
 
 
-// distance = timeHolding * timeRacing
-// totalTime = timeHolding + timeRacing
-// totalTime - timeHolding = timeRacing
-// distance = timeHolding * (totalTime - timeHolding)
-// distance = timeHolding * totalTime - timeHolding ^2
-// 0 = timeHolding ^2 + -totalTime * timeHolding  distance
+    if (numberOfDifferentCards.includes(5)) {
+        hands.fiveOfAKinds.push(hand)
+    } else if (numberOfDifferentCards.includes(4)) {
+        hands.fourOfAKinds.push(hand)
+    } else if (numberOfDifferentCards.includes(3) && (numberOfDifferentCards.includes(2))) {
+        hands.fullHouses.push(hand)
+    } else if (numberOfDifferentCards.includes(3)) {
+        hands.threeOfAKinds.push(hand)
+    } else if (2 == numberOfDifferentCards.filter(card => card == 2).length) {
+        hands.twoPairs.push(hand)
+    } else if (numberOfDifferentCards.includes(2)){
+        hands.onePairs.push(hand)
+    } else if(numberOfDifferentCards.includes(1)) {
+        hands.highCards.push(hand)
+    } else {
+        console.log("Number of different cards array is empty!")
+    }
 
-let [result1, result2] = solveQuadratic(-1, race.totalTime, -race.targetDistance)
+});
 
-let minimumTimeHolding = Math.ceil(result1)
-let maximumTimeHolding = Math.floor(result2)
+hands.highCards.sort(sortHands)
+hands.onePairs.sort(sortHands)
+hands.twoPairs.sort(sortHands)
+hands.threeOfAKinds.sort(sortHands)
+hands.fullHouses.sort(sortHands)
+hands.fourOfAKinds.sort(sortHands)
+hands.fiveOfAKinds.sort(sortHands)
 
-let totalSecondsCanHold = maximumTimeHolding - minimumTimeHolding + 1
+let handCounter = 1
+let totalWinnings = 0
 
-console.log(totalSecondsCanHold)
+hands.highCards.forEach(hand => {
+    let handBid = handBidMap[hand]
+    totalWinnings += handBid * handCounter
+    handCounter ++
+});
+hands.onePairs.forEach(hand => {
+    let handBid = handBidMap[hand]
+    totalWinnings += handBid * handCounter
+    handCounter ++
+});
+hands.twoPairs.forEach(hand => {
+    let handBid = handBidMap[hand]
+    totalWinnings += handBid * handCounter
+    handCounter ++
+});
+hands.threeOfAKinds.forEach(hand => {
+    let handBid = handBidMap[hand]
+    totalWinnings += handBid * handCounter
+    handCounter ++
+});
+hands.fullHouses.forEach(hand => {
+    let handBid = handBidMap[hand]
+    totalWinnings += handBid * handCounter
+    handCounter ++
+});
+hands.fourOfAKinds.forEach(hand => {
+    let handBid = handBidMap[hand]
+    totalWinnings += handBid * handCounter
+    handCounter ++
+});
+hands.fiveOfAKinds.forEach(hand => {
+    let handBid = handBidMap[hand]
+    totalWinnings += handBid * handCounter
+    handCounter ++
+});
 
-function solveQuadratic(a, b, c): [number, number] {
-    let result1 = (-1 * b + Math.sqrt(Math.pow(b, 2) - (4 * a * c))) / (2 * a)      
-    let result2 = (-1 * b - Math.sqrt(Math.pow(b, 2) - (4 * a * c))) / (2 * a)
+console.log(hands)
+console.log(handCounter)
+console.log(totalWinnings)
 
-    return [result1, result2]
+function sortHands(a: string, b: string): number {
+    for (let i = 0; i < a.length; i++) {
+        if (cardValueMapping[a[i]] < cardValueMapping[b[i]]) {
+            // console.log(a, "is less than", b)
+            return -1
+        } else if (cardValueMapping[a[i]] == cardValueMapping[b[i]]) {
+            continue
+        } else {
+            // console.log(a, "is greater than", b)
+            return 1
+        }
+    }
+
+    return 0
 }
