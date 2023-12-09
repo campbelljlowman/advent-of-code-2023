@@ -17,11 +17,6 @@ inputStringArray.forEach(valueLine => {
         iterationsArrays.push(nextIterationValues)
     }
 
-    if (iterationsArrays.at(-1).reduce((sum, current) => sum + current, 0) == 0) {
-        console.log(iterationsArrays.at(-1))
-    }
-
-
     for (let i = iterationsArrays.length - 2; i >= 0; i--) {
         iterationsArrays[i].push(iterationsArrays[i].at(-1) + iterationsArrays[i+1].at(-1))
     }
