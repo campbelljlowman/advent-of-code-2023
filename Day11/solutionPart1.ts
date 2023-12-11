@@ -67,7 +67,7 @@ for (let i = 0; i < galaxies.length; i++) {
     for (let j = i + 1; j < galaxies.length; j++) {
         let distanceBetween = calculateDistanceBetween(galaxies[i], galaxies[j])
         sumOfDistances += distanceBetween
-        // console.log("distance between ", galaxies[i], galaxies[j], distanceBetween)
+        console.log("distance between ", galaxies[i], galaxies[j], distanceBetween)
     }
 }
 

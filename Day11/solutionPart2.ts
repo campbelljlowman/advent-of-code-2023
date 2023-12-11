@@ -1,107 +1,81 @@
 export {} 
 
-const pipesGoingNorth = ['|', '7', 'F']
-const pipesGoingSouth = ['|', 'L', 'J']
-const pipesGoingEast = ['-', '7', 'J']
-const pipesGoingWest = ['-', 'L', 'F']
-const pipesDirectionsMap: {[id: string]: [string, string]} = {'|': ['North', 'South'], '-': ['East', 'West'], 'L': ['North', 'East'], 'J': ['North', 'West'], '7': ['West', 'South'], 'F': ['East', 'South']}
 const inputString = await Bun.file('input.txt').text()
-const pipeMap = inputString.split('\n')
-let cameFromThe: 'North' | 'South' | 'East' | 'West' = 'North'
-let insideOutsideArray: string[][] = []
-
-for (let i = 0; i < pipeMap.length; i++) {
-    let newArrayLine = []
-    for (let j = 0; j < pipeMap[i].length; j++) {
-        newArrayLine.push('U')
-    }
-    insideOutsideArray.push(newArrayLine)
-}
+let galaxyMap = inputString.split('\n')
+const emptyRowString = '.'.repeat(galaxyMap[0].length)
+const emptyGapMultiplyer = 1000000
+let rowsToExpand = []
+let columnsToExpand = []
+let galaxies: Coordinate[] = []
+let sumOfDistances = 0
 
 interface Coordinate {
     x: number,
     y: number
 }
-let currentIndex:Coordinate = {x: 0, y:0}
 
-for (let i = 0; i < pipeMap.length; i++) {
-    for (let j = 0; j < pipeMap[i].length; j++) {
-        if (pipeMap[i][j] == 'S') {
-            currentIndex = {x: i, y: j}
-            insideOutsideArray[i][j] = 'P'
+for (let i = 0; i < galaxyMap.length; i++) {
+    let seenAGalaxy = false
+    for (let j = 0; j < galaxyMap[i].length; j++) {
+        if (galaxyMap[i][j] == '#') {
+            seenAGalaxy = true
+        }
+    }
+    if(!seenAGalaxy) {
+        rowsToExpand.push(i)
+    }
+}
+
+
+for (let i = 0; i < galaxyMap[0].length; i++) {
+    let seenAGalaxy = false
+    for (let j = 0; j < galaxyMap.length; j++) {
+        if (galaxyMap[j][i] == '#') {
+            seenAGalaxy = true
+        }
+    }
+    if(!seenAGalaxy) {
+        columnsToExpand.push(i)
+    }
+}
+
+
+// console.log(rowsToExpand)
+// console.log(columnsToExpand)
+
+// console.log(galaxyMap)
+
+for (let i = 0; i < galaxyMap.length; i++) {
+    for (let j = 0; j < galaxyMap[i].length; j++) {
+        if (galaxyMap[i][j] == '#') {
+            galaxies.push({x: i, y: j})
         }
     }
 }
 
-// console.log(insideOutsideArray)
-
-// console.log(pipeMap[currentIndex.x-1].slice(currentIndex.y-1, currentIndex.y+2))
-// console.log(pipeMap[currentIndex.x].slice(currentIndex.y-1, currentIndex.y+2))
-// console.log(pipeMap[currentIndex.x+1].slice(currentIndex.y-1, currentIndex.y+2))
-
-if (pipesGoingNorth.includes(pipeMap[currentIndex.x-1][currentIndex.y])) {
-    currentIndex.x --
-    cameFromThe = 'South'
-} else if (pipesGoingSouth.includes(pipeMap[currentIndex.x+1][currentIndex.y])) {
-    currentIndex.x ++
-    cameFromThe = 'North'
-} else if (pipesGoingEast.includes(pipeMap[currentIndex.x][currentIndex.y+1])) {
-    currentIndex.x ++
-    cameFromThe = 'West'
-} else if (pipesGoingWest.includes(pipeMap[currentIndex.x][currentIndex.y-1])) {
-    currentIndex.x --
-    cameFromThe = 'East'
+for (let i = 0; i < galaxies.length; i++) {
+    for (let j = i + 1; j < galaxies.length; j++) {
+        let distanceBetween = calculateDistanceBetween(galaxies[i], galaxies[j])
+        sumOfDistances += distanceBetween
+        // console.log("distance between ", galaxies[i], galaxies[j], distanceBetween)
+    }
 }
 
+console.log(sumOfDistances)
 
-// console.log(pipeMap[currentIndex.x][currentIndex.y])
-// console.log(cameFromThe)
+function calculateDistanceBetween(galaxy1: Coordinate, galaxy2: Coordinate): number {
+    let greaterXCoordinate = galaxy1.x - galaxy2.x > 0 ? galaxy1.x : galaxy2.x
+    let lesserXCoordinate = galaxy1.x - galaxy2.x < 0 ? galaxy1.x : galaxy2.x
+    // console.log(lesserXCoordinate, greaterXCoordinate)
+    let emptyRowsInBetweenX = rowsToExpand.filter((value) => value > lesserXCoordinate && value < greaterXCoordinate).length
+    // console.log(emptyRowsInBetween)
+    let xDistance = greaterXCoordinate - lesserXCoordinate + (emptyGapMultiplyer-1) * emptyRowsInBetweenX
 
-let numberOfMoves = 1
-
-while(pipeMap[currentIndex.x][currentIndex.y] !== 'S') {
-    insideOutsideArray[currentIndex.x][currentIndex.y] = 'P'
-    // console.log(insideOutsideArray)
-
-    // console.log(pipeMap[currentIndex.x][currentIndex.y])
-    let nextDirection = getNextDirection(pipeMap[currentIndex.x][currentIndex.y], cameFromThe)
-
-    if (nextDirection == 'North') {
-        currentIndex.x--
-        cameFromThe = 'South'
-    } else if (nextDirection == 'South') {
-        currentIndex.x++
-        cameFromThe = 'North'
-    } else if (nextDirection == 'East') {
-        currentIndex.y++
-        cameFromThe = 'West'
-    } else if (nextDirection == 'West') {
-        currentIndex.y--
-        cameFromThe = 'East'
-    }
-    numberOfMoves ++
-}
-
-let numberOfInsideTiles = 0
-let isInside = false
-
-for (let i = 0; i < pipeMap.length; i++) {
-    let numberOfPipesSeen = 0
-    for (let j = 0; j < pipeMap[i].length; j++) {
-        if (isInside && insideOutsideArray[i][j] == 'U') {
-            numberOfInsideTiles++
-        }
-        if (insideOutsideArray[i][j] == 'P' && [...pipesGoingSouth, ...pipesGoingSouth].includes(pipeMap[i][j])) {
-            isInside = !isInside
-            numberOfPipesSeen++
-        }   
-    }
-
-} 
-
-console.log(numberOfInsideTiles)
-
-function getNextDirection(pipeShape, cameFromThe) {
-    let pipeDirections = pipesDirectionsMap[pipeShape]
-    return pipeDirections.filter(vaule => vaule !== cameFromThe)[0]
+    let greaterYCoordinate = galaxy1.y - galaxy2.y > 0 ? galaxy1.y : galaxy2.y
+    let lesserYCoordinate = galaxy1.y - galaxy2.y < 0 ? galaxy1.y : galaxy2.y
+    // console.log(lesserXCoordinate, greaterXCoordinate)
+    let emptyRowsInBetweenY = columnsToExpand.filter((value) => value > lesserYCoordinate && value < greaterYCoordinate).length
+    // console.log(emptyRowsInBetweenY)
+    let yDistance = greaterYCoordinate - lesserYCoordinate + (emptyGapMultiplyer-1) * emptyRowsInBetweenY
+    return xDistance + yDistance
 }
